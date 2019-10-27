@@ -1,0 +1,3 @@
+unclassed:
+fighter: str, con, dex, int, wis, cha
+monk: dex, wis, str, con, int, cha

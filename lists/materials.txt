@@ -1,0 +1,10 @@
+stone
+straw
+wooden
+copper
+bronze
+iron
+steel
+glass
+
+

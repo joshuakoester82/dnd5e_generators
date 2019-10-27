@@ -1,0 +1,9 @@
+human:16-65
+dwarf:18-200
+elf:80-450
+halfling:20-150
+dragonborn:25-50
+gnome:20-200
+half-elf:20-150
+half-orc:14-60
+tiefling:18-70

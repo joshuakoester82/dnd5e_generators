@@ -1,0 +1,18 @@
+Make a simple GUI
+link buttons, dropdowns, lists, radio buttons to data in code
+Boom Bandits - Push button and spawn bandits of cr rating.
+Boom bandits - check boxes to supply race list
+Boom bandits - gear for each bandit
+Boom bandits - horde for killing bandit lair
+
+
+Character
+age - should be generated along a curve. How is age distributed?
+Gear (armor, weapons)
+Items(adventuring gear if any. Misc items)
+Loot(money, rare and magic items based on CR)
+Horde(from horde table based on CR)
+
+
+
+

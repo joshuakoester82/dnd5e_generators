@@ -1,0 +1,5 @@
+fighter:[2]martial-melee:martial-ranged:all armor:adventuring gear
+
+create a function that generates gear by class, following a generation structure from a generate_gear.txt file
+The sytax for generating is above. It generates by pulling random elements from the appropriate list.
+1 item is assumed, but if it finds brackets it will the range within brackets of items.
