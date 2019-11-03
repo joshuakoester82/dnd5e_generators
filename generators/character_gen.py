@@ -1,5 +1,5 @@
 import random
-import helper_functions as helper
+import sqlite3
 
 # region Load variables from file
 with open("../lists/colors.txt") as f:
@@ -23,6 +23,10 @@ with open("../lists/class_ability_order.txt") as f:
 with open("../lists/class_equipment.txt") as f:
     class_equipment = f.read().split("\n")
 
+# endregion
+# region Load database and prepare cursor
+conn = sqlite3.Connection("../db/generators.db")
+c = conn.cursor()
 # endregion
 
 
@@ -63,7 +67,7 @@ class GenerateCharacter:
         else:
             self.ability_scores = ability_scores
         if equipment is None:
-            self.equipment = self.generate_equipment(self.player_class)
+            self.equipment = self.get_gear(self.get_loadout(self.player_class))
         else:
             self.equipment = equipment
 
@@ -167,25 +171,94 @@ class GenerateCharacter:
             string_list.append(chunk)
         return ", ".join(string_list)
 
-    def generate_equipment(self, cclass):
+    def get_loadout(self, cclass):
         """
-        Generate a list of equipment based on class table. Randomize and return as list
-        :param cclass: string
+        Select a loadout from the loadout table
+        :param cclass: str
+        :return: tuple
+        """
+        table = c.execute(f"""SELECT * FROM loadouts WHERE cclass = '{cclass}'""").fetchall()
+        return random.choice(table)
+
+    def get_gear(self, loadout):
+        """
+        Constructs a dictionary containing character equipment data (melee weapon, ranged weapon, armor, shield, items)
+        Dictionary is constructed with sqlite queries. gen_query() is used to generate some queries
+        :param loadout: tuple
+        :return: dict
+        """
+        gear_dict, list_wpn_melee, list_wpn_ranged, list_items = {}, [], [], []
+
+        # melee weapon
+        melee_query = self.gen_query(loadout, 1, "weapons", "type")
+        for i in range(len(melee_query)):
+            list_wpn_melee.append(random.choice(c.execute(melee_query[i]).fetchall()))
+
+        # ranged weapon
+        ranged_query = self.gen_query(loadout, 2, "weapons", "type")
+        for i in range(len(ranged_query)):
+            list_wpn_ranged.append(random.choice(c.execute(ranged_query[i]).fetchall()))
+
+        # armor
+        armor_query = self.gen_query(loadout, 3, "armor", "type")
+        armor = random.choice(c.execute(armor_query[0]).fetchall())
+
+        # shield (simply Shield or None)
+        shield = loadout[4]
+
+        # Items
+        item_row = loadout[5].split(",")
+        for item in item_row:
+            item_count, item_type = item.split()[0].split("-"), item.split()[1:]
+            if len(item_count) > 1:
+                item_count = random.choice(range(int(item_count[0]), int(item_count[1]) + 1))
+            else:
+                item_count = int(item_count[0])
+
+            for i in range(item_count):
+                list_items.append(random.choice(c.execute(
+                    f"""SELECT * FROM adventuring_gear WHERE type LIKE '%{item_type[0]}%'""").fetchall()))
+
+        # update gear dictionary
+        gear_dict["melee"] = list_wpn_melee
+        gear_dict["ranged"] = list_wpn_ranged
+        gear_dict["armor"] = armor
+        gear_dict["shield"] = shield
+        gear_dict["items"] = list_items
+
+        return gear_dict
+
+    def gen_query(self, loadout, index, table, column):
+        """
+        Helper function.
+        Constructs a list of complex SQL queries to be used in get_gear(). By complex I mean containing more than one
+        LIKE statement.
+
+        :param loadout: tuple
+        :param index: int
+        :param table: str
+        :param column: str
         :return: list
         """
-        equipment = []
-        for line in equipment_list:
-            split_by_type = line.split(":")
-            if split_by_type[0] == cclass:
-                weapons = split_by_type[1].split(",")
-                armor = split_by_type[2].split(",")
-                equipment += [random.choice(weapons), random.choice(armor)]
-                equipment = [item.strip() for item in equipment]
-        return equipment
+        return_list = []
+        query_list = loadout[index].split(",")  # split cell into separate item queries
+
+        for weapon in query_list:
+            query_elements = weapon.split()  # split query into each query element
+            for i, element in enumerate(query_elements):
+                if i == 0:
+                    query = f"SELECT * FROM {table} WHERE {column} LIKE '%{element}%'"
+                else:
+                    query += f" AND type LIKE '%{element}%'"
+            return_list.append(query)
+
+        return return_list
 
 
 
-chars = [print(GenerateCharacter(player_class=["unclassed","fighter","monk"])) for i in range(10)]
+chars = [print(GenerateCharacter(player_class=["fighter"])) for i in range(10)]
+
+
 
 
 
