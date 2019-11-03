@@ -1,5 +1,5 @@
 # dnd_generators
-Misc generators for Dungeons &amp; Dragons 5e
+Misc generators for Dungeons &amp; Dragons 5e. Generates 5e characters from data pulled from databases and .txt files.
 
 ## Current Features
 * Generates random characters with name, age, race, gender, class, attributes, &amp; worn gear.
