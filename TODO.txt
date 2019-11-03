@@ -8,8 +8,6 @@ Boom bandits - horde for killing bandit lair
 
 Character
 age - should be generated along a curve. How is age distributed?
-Gear (armor, weapons)
-Items(adventuring gear if any. Misc items)
 Loot(money, rare and magic items based on CR)
 Horde(from horde table based on CR)
 
